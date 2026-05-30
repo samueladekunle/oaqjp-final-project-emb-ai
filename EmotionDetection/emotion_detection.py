@@ -5,12 +5,22 @@ def emotion_detector(text_to_analyze):
     body = { "raw_document": { "text": text_to_analyze } }
     url = 'https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict'
     response = requests.post(url, headers=headers, json=body)
-    json = response.json()
-    emotion, score = get_dominant_emotion(json)
-    json = response.json()
-    emotions = json["emotionPredictions"][0]["emotion"]
-    emotions['dominant_emotion'] = emotion
-    return emotions
+    if response.status_code // 100 == 2:
+        json = response.json()
+        emotion, score = get_dominant_emotion(json)
+        json = response.json()
+        emotions = json["emotionPredictions"][0]["emotion"]
+        emotions['dominant_emotion'] = emotion
+        return emotions
+    else:
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            'dominant_emotion': None
+        }
 
 
 def get_dominant_emotion(response):
